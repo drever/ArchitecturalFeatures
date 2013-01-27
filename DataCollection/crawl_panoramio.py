@@ -21,7 +21,7 @@ meta_data_file_name = "metadata.p"
 
 def main():
     image_list = query_image_list()
-    image_directory_name = query_images(image_list, "test")
+    image_directory_name = query_images_and_save(image_list, "test")
     normalize_images(image_directory)
 
 def query_image_list(tag=None, size='medium', setp='public', rangep=(0, 100), region=((-180, -90), (180, 90)), mapFilter=False):
