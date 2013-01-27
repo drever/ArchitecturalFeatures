@@ -1,0 +1,5 @@
+data_directory = "../Data/"
+image_server_url = "www.panoramio.com"
+subfolder_normalized = "normalized/"
+subfolder_original = "original/"
+meta_data_file_name = "metadata.p"
