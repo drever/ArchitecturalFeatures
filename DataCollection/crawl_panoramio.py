@@ -17,6 +17,7 @@ data_directory = "../Data/"
 image_server_url = "www.panoramio.com"
 subfolder_normalized = "normalized/"
 subfolder_original = "original/"
+meta_data_file_name = "metadata.p"
 
 def main():
     image_list = query_image_list()
@@ -45,7 +46,7 @@ def query_images_and_save(image_list, list_name):
     ldd = data_directory + list_name + "/"
     if not os.path.exists(ldd):
         os.makedirs(ldd)
-    pickle.dump(image_list, open(ldd + "metadata.p", "wb"))
+    pickle.dump(image_list, open(ldd + meta_data_file_name, "wb"))
     for photo in image_list["photos"]:
         print "loading from " + photo["photo_url"]
         file_name = ldd + subfolder_original + photo["photo_file_url"].split('/')[-1]
@@ -79,10 +80,16 @@ class DataSet:
             a = numpy.array(image)
             s = image.size[0] * image.size[1]
             self.imageData[i, (data_length - s)/2:data_length - (data_length - s)/2] = a.reshape((1,  s))
+
+        self.metaData = pickle.load(open(image_directory_name + meta_data_file_name, 'rb'))
+
         return
 
     def getImage(self, i):
         return Image.fromarray(self.imageData[i, :].reshape((self.imageSize, self.imageSize)))
+    def getCoordinates(self, i):
+        photo = self.metaData["photos"][i]
+        return (photo["longitude"], photo["latitude"])
 
 if __name__ == "__main__":
     main()
