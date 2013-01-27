@@ -9,6 +9,10 @@ import pickle
 from PIL import Image
 from PIL import ImageOps
 
+import numpy
+
+import pdb
+
 data_directory = "../Data/"
 image_server_url = "www.panoramio.com"
 subfolder_normalized = "normalized/"
@@ -55,9 +59,30 @@ def normalize_images(image_directory_name, image_size=100):
             os.makedirs(ddn)
     for image_name in os.listdir(image_directory_name + subfolder_original):
         image = Image.open(image_directory_name + subfolder_original + image_name)
-        ml = max(image.size)
-        image = image.resize((ml / image.size[0] * image_size, ml / image.size[1] * image_size))
+        image.thumbnail((image_size, image_size))
         image = ImageOps.grayscale(image)
         image.save(ddn + image_name)
+
+class DataSet:
+    """Class initializer. All files in the image directory must have the same dimensions. Images are loaded and transformed into a numpy array for further analysis."""
+    def __init__(self, image_directory_name):
+        file_names = os.listdir(image_directory_name + subfolder_normalized)
+        im = Image.open(image_directory_name + subfolder_normalized + file_names[0])
+        self.imageSize = max(im.size[0], im.size[1])
+        data_length = self.imageSize * self.imageSize
+        number_of_files = len(file_names)
+        self.imageData = numpy.zeros((number_of_files, self.imageSize * self.imageSize))
+
+        for file_name, i in zip(file_names, range(number_of_files)):
+            print file_name
+            image = Image.open(image_directory_name + subfolder_normalized + file_name)
+            a = numpy.array(image)
+            s = image.size[0] * image.size[1]
+            self.imageData[i, (data_length - s)/2:data_length - (data_length - s)/2] = a.reshape((1,  s))
+        return
+
+    def getImage(self, i):
+        return Image.fromarray(self.imageData[i, :].reshape((self.imageSize, self.imageSize)))
+
 if __name__ == "__main__":
     main()
